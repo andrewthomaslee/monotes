@@ -57,20 +57,20 @@
             pyproject-build-systems.overlays.default
             overlay
             (final: prev: {
-              nixfastapi = prev.nixfastapi.overrideAttrs (old: {
+              monotes = prev.monotes.overrideAttrs (old: {
                 passthru =
                   (old.passthru or {})
                   // {
                     tests = let
-                      virtualenv = final.mkVirtualEnv "nixfastapi-pytest" {
-                        nixfastapi = ["dev"];
+                      virtualenv = final.mkVirtualEnv "monotes-pytest" {
+                        monotes = ["dev"];
                       };
                     in
                       (old.tests or {})
                       // {
                         pytest = pkgs.stdenv.mkDerivation {
-                          name = "${final.nixfastapi.name}-pytest";
-                          inherit (final.nixfastapi) src;
+                          name = "${final.monotes.name}-pytest";
+                          inherit (final.monotes) src;
                           nativeBuildInputs = [virtualenv];
                           dontConfigure = true;
                           buildPhase = ''
@@ -95,7 +95,7 @@
     packages = forAllSystems (system: let
       pkgs = nixpkgs.legacyPackages.${system};
       pythonSet = pythonSets.${system};
-      venv = pythonSet.mkVirtualEnv "nixfastapi-venv" workspace.deps.default;
+      venv = pythonSet.mkVirtualEnv "monotes-venv" workspace.deps.default;
       mainPy = pkgs.runCommand "main.py" {buildInputs = [venv];} ''
         mkdir -p $out
         cp ${./main.py} $out/main.py
@@ -115,7 +115,7 @@
     in rec {
       # Create a docker image with nix-store paths as layers
       docker = pkgs.dockerTools.buildLayeredImage {
-        name = "nixfastapi-container";
+        name = "monotes-container";
         created = "now";
         contents = layers;
         config = {
@@ -124,7 +124,7 @@
         };
       };
       bundledApp = pkgs.symlinkJoin {
-        name = "nixfastapi-bundle";
+        name = "monotes-bundle";
         paths = layers;
       };
       default =
@@ -137,7 +137,7 @@
       system: let
         pkgs = nixpkgs.legacyPackages.${system};
         pythonSet = pythonSets.${system};
-        venv = pythonSet.mkVirtualEnv "nixfastapi-venv" workspace.deps.default;
+        venv = pythonSet.mkVirtualEnv "monotes-venv" workspace.deps.default;
         inherit (pkgs.lib) filterAttrs hasSuffix mapAttrsToList genAttrs;
 
         # App discovery and creation
@@ -190,7 +190,7 @@
         lib.composeManyExtensions [
           editableOverlay
           (final: prev: {
-            nixfastapi = prev.nixfastapi.overrideAttrs (old: {
+            monotes = prev.monotes.overrideAttrs (old: {
               src = lib.fileset.toSource {
                 root = old.src;
                 fileset = lib.fileset.unions [
@@ -212,7 +212,7 @@
           })
         ]
       );
-      virtualenvDev = editablePythonSet.mkVirtualEnv "nixfastapi-dev" workspace.deps.all;
+      virtualenvDev = editablePythonSet.mkVirtualEnv "monotes-dev" workspace.deps.all;
       #------------------------------------------------------------------------------#
       # tmux.conf file
       tmuxConf = pkgs.writeText "tmux.conf" ''
@@ -285,7 +285,7 @@
     checks = forAllSystems (system: let
       pythonSet = pythonSets.${system};
     in {
-      inherit (pythonSet.nixfastapi.passthru.tests) pytest;
+      inherit (pythonSet.monotes.passthru.tests) pytest;
     });
   };
 }

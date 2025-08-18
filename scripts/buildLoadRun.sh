@@ -14,7 +14,7 @@ echo "🚀 Building Docker image with Nix..."
 nix build .#docker
 
 echo "📥 Loading image into Docker..."
-IMAGE_TAG=$(docker load < result | grep -o 'nixfastapi-container:[^ ]*')
+IMAGE_TAG=$(docker load < result | grep -o 'monotes-container:[^ ]*')
 
 echo "🏃 Running container on port 8000 (auto-cleanup enabled)..."
 docker run --rm -p 8000:8000 "$IMAGE_TAG"

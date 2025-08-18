@@ -1,6 +1,6 @@
 services:
-  nixfastapi:
-    container_name: nixfastapi-container
+  monotes:
+    container_name: monotes-container
     build:
       context: .
       dockerfile_inline: |
@@ -35,16 +35,16 @@ services:
     ports:
       - 8000:8000
     volumes:
-      - nixfastapi-data:/data
+      - monotes-data:/data
     restart: no
     healthcheck:
       test: ["CMD", "/app/curl", "-f", "http://0.0.0.0:8000/health"]
   
 volumes:
-  nixfastapi-data:
+  monotes-data:
     driver: local
 
 networks:
   default:
-    name: nixfastapi-network
+    name: monotes-network
     external: false

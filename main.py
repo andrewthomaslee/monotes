@@ -9,7 +9,7 @@ from fastapi.middleware.gzip import GZipMiddleware
 
 from pathlib import Path
 import uvicorn
-from nixfastapi import hello
+from monotes import hello
 
 # Discover the base directory relative to this file
 BASE_DIR = Path(__file__).parent
