@@ -107,12 +107,17 @@
         tailwindcss -i ${./static/input.css} -o $out/static/output.css --minify
         rsync -av --exclude='input.css' ${./static}/ $out/static/
       '';
+      curl = pkgs.runCommand "curl" {} ''
+        mkdir -p $out
+        ln -s ${pkgs.curl}/bin/curl $out/curl
+      '';
+      layers = [curl staticDirectory mainPy];
     in rec {
       # Create a docker image with nix-store paths as layers
       docker = pkgs.dockerTools.buildLayeredImage {
         name = "nixfastapi-container";
         created = "now";
-        contents = [pkgs.curl staticDirectory mainPy];
+        contents = layers;
         config = {
           Cmd = ["/main.py"];
           Volumes = {"/data" = {};};
@@ -120,7 +125,7 @@
       };
       bundledApp = pkgs.symlinkJoin {
         name = "nixfastapi-bundle";
-        paths = [pkgs.curl staticDirectory mainPy];
+        paths = layers;
       };
       default =
         if pkgs.stdenv.isLinux
@@ -225,6 +230,7 @@
           tailwindcss_4
           watchman
           yazi
+          lazydocker
           brave
           firefox
         ]

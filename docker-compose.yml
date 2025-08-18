@@ -38,13 +38,7 @@ services:
       - nixfastapi-data:/data
     restart: no
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://0.0.0.0:8000/"]
-      interval: 15s
-      timeout: 10s
-      retries: 5
-    stdin_open: true
-    tty: true
-
+      test: ["CMD", "/app/curl", "-f", "http://0.0.0.0:8000/health"]
   
 volumes:
   nixfastapi-data:
