@@ -112,7 +112,7 @@
       docker = pkgs.dockerTools.buildLayeredImage {
         name = "nixfastapi-container";
         created = "now";
-        contents = [staticDirectory mainPy];
+        contents = [pkgs.curl staticDirectory mainPy];
         config = {
           Cmd = ["/main.py"];
           Volumes = {"/data" = {};};
@@ -120,7 +120,7 @@
       };
       bundledApp = pkgs.symlinkJoin {
         name = "nixfastapi-bundle";
-        paths = [staticDirectory mainPy];
+        paths = [pkgs.curl staticDirectory mainPy];
       };
       default =
         if pkgs.stdenv.isLinux

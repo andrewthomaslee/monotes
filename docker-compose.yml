@@ -1,6 +1,6 @@
 services:
   nixfastapi:
-    image: nixfastapi-container:latest
+    container_name: nixfastapi-container
     build:
       context: .
       dockerfile_inline: |
@@ -34,3 +34,23 @@ services:
         CMD ["/app/main.py"]
     ports:
       - 8000:8000
+    volumes:
+      - nixfastapi-data:/data
+    restart: no
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://0.0.0.0:8000/"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+    stdin_open: true
+    tty: true
+
+  
+volumes:
+  nixfastapi-data:
+    driver: local
+
+networks:
+  default:
+    name: nixfastapi-network
+    external: false
