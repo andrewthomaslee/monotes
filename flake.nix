@@ -96,41 +96,28 @@
       pkgs = nixpkgs.legacyPackages.${system};
       pythonSet = pythonSets.${system};
       venv = pythonSet.mkVirtualEnv "monotes-venv" workspace.deps.default;
-      mainPy = pkgs.runCommand "main.py" {buildInputs = [venv];} ''
+      main = pkgs.runCommand "main" {buildInputs = [venv];} ''
         mkdir -p $out
         cp ${./main.py} $out/main.py
         chmod +x $out/main.py
         patchShebangs $out/main.py
       '';
-      staticDirectory = pkgs.runCommand "staticDirectory" {buildInputs = [pkgs.rsync pkgs.tailwindcss_4];} ''
+      static = pkgs.runCommand "static" {buildInputs = [pkgs.tailwindcss_4];} ''
         mkdir -p $out/static
-        tailwindcss -i ${./static/input.css} -o $out/static/output.css --minify
-        rsync -v --exclude='input.css' ${./static}/ $out/static/
+        cp -r ${./static}/* $out/static/
+        tailwindcss -i ${./static/input.css} -o ./static/output.css --minify
+        cp ./static/output.css $out/static/output.css
       '';
-      curl = pkgs.runCommand "curl" {} ''
-        mkdir -p $out
-        ln -s ${pkgs.curl}/bin/curl $out/curl
-      '';
-      layers = [curl staticDirectory mainPy];
-    in rec {
-      # Create a docker image with nix-store paths as layers
-      docker = pkgs.dockerTools.buildLayeredImage {
-        name = "monotes-container";
-        created = "now";
-        contents = layers;
-        config = {
-          Cmd = ["/main.py"];
-          Volumes = {"/data" = {};};
-        };
-      };
-      bundledApp = pkgs.symlinkJoin {
+      # curl = pkgs.runCommand "curl" {} ''
+      #   mkdir -p $out
+      #   ln -s ${pkgs.curl}/bin/curl $out/curl
+      # '';
+    in {
+      default = pkgs.buildEnv {
         name = "monotes-bundle";
-        paths = layers;
+        paths = [static main];
+        pathsToLink = ["/"];
       };
-      default =
-        if pkgs.stdenv.isLinux
-        then docker
-        else bundledApp;
     });
     # Dynamic script discovery for .sh and .py files
     apps = forAllSystems (

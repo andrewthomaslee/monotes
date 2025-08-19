@@ -5,12 +5,14 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - 9898:8000
+      - 7999:7999
     volumes:
       - monotes-data:/data
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "/app/curl", "-f", "http://0.0.0.0:8000/health"]
+      test: ["CMD", "/app/curl", "-f", "http://0.0.0.0:7999/health"]
+    tty: true
+    stdin_open: true
   
 volumes:
   monotes-data:
