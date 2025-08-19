@@ -57,7 +57,7 @@ fi
 tmux new-session -d -s $SESSION_NAME -n "🐋Docker" -c "$REPO_ROOT"
 tmux send-keys -t $SESSION_NAME:0 "docker compose up" C-m
 
-tmux new-window -t $SESSION_NAME -n "🗨️Lazydocker" -c "$REPO_ROOT"
+tmux new-window -t $SESSION_NAME -n "🪵Lazydocker" -c "$REPO_ROOT"
 tmux send-keys -t $SESSION_NAME:1 "lazydocker" C-m
 
 tmux new-window -t $SESSION_NAME -n "🦁Brave" -c "$REPO_ROOT"

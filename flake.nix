@@ -151,7 +151,7 @@
         # Generate all script apps
         scriptApps = genAttrs appNames makeApp;
       in
-        scriptApps // {default = scriptApps.tmuxStartup;}
+        scriptApps // {default = scriptApps.fastapi-dev;}
     );
 
     devShells = forAllSystems (system: let
