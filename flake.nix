@@ -151,7 +151,7 @@
         # Generate all script apps
         scriptApps = genAttrs appNames makeApp;
       in
-        scriptApps // {default = scriptApps.buildBundledApp;}
+        scriptApps // {default = scriptApps.tmuxStartup;}
     );
 
     devShells = forAllSystems (system: let
@@ -232,7 +232,6 @@
           export REPO_ROOT=$(git rev-parse --show-toplevel)
           ${pkgs.uv}/bin/uv sync
           source .venv/bin/activate
-          source ${./scripts/tmuxStartup.sh}
         '';
       };
       # This devShell uses uv2nix to construct a virtual environment purely from Nix, using the same dependency specification as the application.
@@ -251,7 +250,6 @@
           unset PYTHONPATH
           export REPO_ROOT=$(git rev-parse --show-toplevel)
           source ${virtualenvDev}/bin/activate
-          source ${./scripts/tmuxStartup.sh}
         '';
       };
     });
