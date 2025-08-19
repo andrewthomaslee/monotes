@@ -15,7 +15,7 @@ services:
         RUN nix \
             --extra-experimental-features "nix-command flakes" \
             --option filter-syscalls false \
-            build .#packages.x86_64-linux.bundledApp
+            build .#packages.aarch64-linux.bundledApp
 
         # Copy the Nix store closure into a directory. The Nix store closure is the
         # entire set of Nix store values that we need for our build.
