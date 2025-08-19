@@ -6,17 +6,13 @@ services:
       dockerfile: Dockerfile
     ports:
       - 7999:7999
-    volumes:
-      - monotes-data:/data
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "/app/curl", "-f", "http://0.0.0.0:7999/health"]
     tty: true
     stdin_open: true
-  
-volumes:
-  monotes-data:
-    driver: local
+    networks:
+      - default
 
 networks:
   default:

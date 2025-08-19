@@ -96,27 +96,21 @@
       pkgs = nixpkgs.legacyPackages.${system};
       pythonSet = pythonSets.${system};
       venv = pythonSet.mkVirtualEnv "monotes-venv" workspace.deps.default;
-      main = pkgs.runCommand "main" {buildInputs = [venv];} ''
-        mkdir -p $out
-        cp ${./main.py} $out/main.py
-        chmod +x $out/main.py
-        patchShebangs $out/main.py
-      '';
-      static = pkgs.runCommand "static" {buildInputs = [pkgs.tailwindcss_4];} ''
-        mkdir -p $out/static
-        cp -r ${./static}/* $out/static/
-        tailwindcss -i ${./static/input.css} -o ./static/output.css --minify
-        cp ./static/output.css $out/static/output.css
-      '';
-      # curl = pkgs.runCommand "curl" {} ''
-      #   mkdir -p $out
-      #   ln -s ${pkgs.curl}/bin/curl $out/curl
-      # '';
     in {
-      default = pkgs.buildEnv {
+      default = pkgs.stdenv.mkDerivation {
         name = "monotes-bundle";
-        paths = [static main];
-        pathsToLink = ["/"];
+        src = ./.;
+        buildInputs = [venv];
+        installPhase = ''
+          mkdir -p $out/static
+          cp -r ${./static}/* $out/static/
+          ${pkgs.tailwindcss_4}/bin/tailwindcss -i ${./static/input.css} -o ./static/output.css
+          cp ./static/output.css $out/static/output.css
+          cp ${./main.py} $out/main.py
+          chmod +x $out/main.py
+          patchShebangs $out/main.py
+          ln -s ${pkgs.curl}/bin/curl $out/curl
+        '';
       };
     });
     # Dynamic script discovery for .sh and .py files
@@ -156,14 +150,8 @@
 
         # Generate all script apps
         scriptApps = genAttrs appNames makeApp;
-
-        # Platform-specific default
-        platformDefault =
-          if pkgs.stdenv.isLinux
-          then scriptApps.buildLoadRun
-          else scriptApps.buildBundledApp;
       in
-        scriptApps // {default = platformDefault;}
+        scriptApps // {default = scriptApps.buildBundledApp;}
     );
 
     devShells = forAllSystems (system: let
