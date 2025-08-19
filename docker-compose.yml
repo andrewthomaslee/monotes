@@ -33,7 +33,7 @@ services:
         COPY --from=builder /tmp/build/result /app
         CMD ["/app/main.py"]
     ports:
-      - 8000:8000
+      - 9898:8000
     volumes:
       - monotes-data:/data
     restart: no
