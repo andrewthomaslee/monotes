@@ -105,7 +105,7 @@
       staticDirectory = pkgs.runCommand "staticDirectory" {buildInputs = [pkgs.rsync pkgs.tailwindcss_4];} ''
         mkdir -p $out/static
         tailwindcss -i ${./static/input.css} -o $out/static/output.css --minify
-        rsync -av --exclude='input.css' ${./static}/ $out/static/
+        rsync -v --exclude='input.css' ${./static}/ $out/static/
       '';
       curl = pkgs.runCommand "curl" {} ''
         mkdir -p $out

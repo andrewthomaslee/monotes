@@ -20,9 +20,8 @@ RUN cp -R $(nix-store -qR result/) /tmp/nix-store-closure
 # but they're fully self-contained so we don't need Nix anymore.
 FROM scratch
 
-WORKDIR /app
-
 # Copy /nix/store
 COPY --from=builder /tmp/nix-store-closure /nix/store
-COPY --from=builder /tmp/build/result /app
-CMD ["/app/main.py"]
+COPY --from=builder /tmp/build/result /
+COPY --from=builder /tmp/build/result/static /static
+CMD ["/main.py"]
