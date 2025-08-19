@@ -98,7 +98,7 @@
       venv = pythonSet.mkVirtualEnv "monotes-venv" workspace.deps.default;
     in {
       default = pkgs.stdenv.mkDerivation {
-        name = "monotes-bundle";
+        name = "monotes-package";
         src = ./.;
         buildInputs = [venv];
         installPhase = ''
