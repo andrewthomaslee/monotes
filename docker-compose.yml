@@ -8,7 +8,7 @@ services:
       - 9898:8000
     volumes:
       - monotes-data:/data
-    restart: no
+    restart: unless-stopped
     healthcheck:
       test: ["CMD", "/app/curl", "-f", "http://0.0.0.0:8000/health"]
   
