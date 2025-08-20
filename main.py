@@ -17,9 +17,9 @@ BASE_DIR = Path(__file__).parent
 app = FastAPI()
 app.add_middleware(GZipMiddleware, minimum_size=1000, compresslevel=9)
 
-app.mount("/static", StaticFiles(directory=BASE_DIR / "static", follow_symlink=True), name="static")
+app.mount("/style", StaticFiles(directory=BASE_DIR / "style", follow_symlink=True), name="style")
 
-templates = Jinja2Templates(directory=BASE_DIR / "static" / "templates") 
+templates = Jinja2Templates(directory=BASE_DIR / "style" / "templates") 
 
 @app.get("/", response_class=HTMLResponse)
 async def read_index(request: Request):
@@ -29,7 +29,7 @@ async def read_index(request: Request):
 
 @app.get("/favicon.ico")
 async def favicon(request: Request):
-    return FileResponse(BASE_DIR / "static" / "assets" / "favicon.ico")
+    return FileResponse(BASE_DIR / "style" / "assets" / "favicon.ico")
 
 @app.get("/health")
 async def health(request: Request):

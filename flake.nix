@@ -102,14 +102,13 @@
         src = ./.;
         buildInputs = [venv];
         installPhase = ''
-          mkdir -p $out/static
-          cp -r ${./static}/* $out/static/
-          ${pkgs.tailwindcss_4}/bin/tailwindcss -i ${./static/input.css} -o ./static/output.css
-          cp ./static/output.css $out/static/output.css
+          mkdir -p $out/style
+          cp -r ${./style}/* $out/style/
+          ${pkgs.tailwindcss_4}/bin/tailwindcss -i ${./style/input.css} -o ./style/output.css
+          cp ./style/output.css $out/style/output.css
           cp ${./main.py} $out/main.py
           chmod +x $out/main.py
           patchShebangs $out/main.py
-          ln -s ${pkgs.curl}/bin/curl $out/curl
         '';
       };
     });
@@ -174,7 +173,7 @@
                   (old.src + "/main.py")
                   (old.src + "/src/")
                   (old.src + "/tests/")
-                  (old.src + "/static/")
+                  (old.src + "/style/")
                   (old.src + "/scripts/")
                 ];
               };

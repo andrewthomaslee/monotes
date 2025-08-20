@@ -26,8 +26,4 @@ WORKDIR /app
 # Copy /nix/store
 COPY --from=builder /tmp/nix-store-closure /nix/store
 COPY --from=builder /tmp/build/result /app
-
-HEALTHCHECK --interval=1m --timeout=5s --start-period=10s \
-  CMD /app/curl -f http://0.0.0.0:7999/health
-
 CMD ["/app/main.py"]
