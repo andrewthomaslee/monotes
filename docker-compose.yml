@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - 7999:7999
+      - 6969:7999
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "/app/curl", "-f", "http://0.0.0.0:7999/health"]
