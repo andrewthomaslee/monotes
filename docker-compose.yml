@@ -8,7 +8,7 @@ services:
       - 6969:7999
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "/app/curl", "-f", "http://0.0.0.0:7999/health"]
+      test: ["CMD", "/app/curl", "-f", "http://0.0.0.0:6969/health"]
     tty: true
     stdin_open: true
     networks:
