@@ -61,7 +61,7 @@ tmux new-window -t $SESSION_NAME -n "🪵Lazydocker" -c "$REPO_ROOT"
 tmux send-keys -t $SESSION_NAME:1 "lazydocker" C-m
 
 tmux new-window -t $SESSION_NAME -n "🦁Brave" -c "$REPO_ROOT"
-tmux send-keys -t $SESSION_NAME:2 "brave --user-data-dir=/tmp/brave-dev-data --new-window --incognito http://0.0.0.0:6969" C-m
+tmux send-keys -t $SESSION_NAME:2 "brave --user-data-dir=/tmp/brave-dev-data --new-window --incognito http://0.0.0.0:7999" C-m
 
 echo "Tmux created session ✨'$SESSION_NAME'✨"
 tmux attach-session -t $SESSION_NAME
