@@ -55,7 +55,7 @@ if tmux has-session -t $SESSION_NAME 2>/dev/null; then
 fi
 
 tmux new-session -d -s $SESSION_NAME -n "🌬️Tailwind" -c "$REPO_ROOT"
-tmux send-keys -t $SESSION_NAME:0 "tailwindcss -i ./static/input.css -o ./static/output.css --watch" C-m
+tmux send-keys -t $SESSION_NAME:0 "tailwindcss -i ./style/input.css -o ./style/output.css --watch" C-m
 
 tmux new-window -t $SESSION_NAME -n "🐍FastAPI" -c "$REPO_ROOT"
 tmux send-keys -t $SESSION_NAME:1 "uvicorn main:app --port 8000 --host 0.0.0.0 --reload" C-m

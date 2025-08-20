@@ -11,6 +11,8 @@ services:
     stdin_open: true
     networks:
       - default
+    ports:
+      - "7999:7999"
 
 networks:
   default:
