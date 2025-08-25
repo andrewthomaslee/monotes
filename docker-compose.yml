@@ -7,10 +7,5 @@ services:
     restart: unless-stopped
     tty: true
     stdin_open: true
-    networks:
-      - default
-
-networks:
-  default:
-    name: monotes-network
-    external: false
+    ports:
+      - ${PORTS:-7999}:7999
