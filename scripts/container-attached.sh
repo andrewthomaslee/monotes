@@ -7,7 +7,17 @@ if [ -z "$REPO_ROOT" ]; then
 fi
 cd $REPO_ROOT
 
-SESSION_NAME="nixfastapi-dev"
+# Simple script to build, load, and run Docker image with Nix
+# 1. Build → 2. Load → 3. Run (with auto-cleanup)
+
+echo "🚀 Building Docker image with Nix..."
+nix build .#container
+
+echo "📥 Loading image into Docker..."
+IMAGE_TAG=$(docker load < result | grep -o 'monotes-container:[^ ]*')
+
+
+SESSION_NAME="nixfastapi-container"
 
 # Function to handle user choice when session exists
 handle_existing_session() {
@@ -54,14 +64,14 @@ if tmux has-session -t $SESSION_NAME 2>/dev/null; then
     handle_existing_session
 fi
 
-tmux new-session -d -s $SESSION_NAME -n "💨_Tailwind" -c "$REPO_ROOT"
-tmux send-keys -t $SESSION_NAME:0 "tailwindcss -i ./style/input.css -o ./style/output.css --watch" C-m
+tmux new-session -d -s $SESSION_NAME -n "📦_Container" -c "$REPO_ROOT"
+tmux send-keys -t $SESSION_NAME:0 "docker run --rm -p 7999:7999 -it "$IMAGE_TAG" sh" C-m
 
-tmux new-window -t $SESSION_NAME -n "🐍_FastAPI" -c "$REPO_ROOT"
-tmux send-keys -t $SESSION_NAME:1 "export PYTHONPATH=\"\${PYTHONPATH}:$(pwd)/src\" && uvicorn main:app --port 8000 --host 0.0.0.0 --reload --timeout-keep-alive 0 --timeout-graceful-shutdown 1 --reload-delay 0.5" C-m
+tmux new-window -t $SESSION_NAME -n "🪵_Lazydocker" -c "$REPO_ROOT"
+tmux send-keys -t $SESSION_NAME:1 "lazydocker" C-m
 
 tmux new-window -t $SESSION_NAME -n "🦁_Brave" -c "$REPO_ROOT"
-tmux send-keys -t $SESSION_NAME:2 "brave --user-data-dir=/tmp/brave-dev-uvicorn --new-window --incognito --disable-cache --disk-cache-size=0 --media-cache-size=0 http://0.0.0.0:8000" C-m
+tmux send-keys -t $SESSION_NAME:2 "brave --user-data-dir=/tmp/brave-dev-container --new-window --incognito http://0.0.0.0:7999" C-m
 
 echo "Tmux created session ✨'$SESSION_NAME'✨"
 tmux attach-session -t $SESSION_NAME
