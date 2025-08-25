@@ -283,7 +283,7 @@
           export REPO_ROOT=$(git rev-parse --show-toplevel)
           export VIRTUAL_ENV=${virtualenvDev}
           source ${virtualenvDev}/bin/activate
-          source ${./scripts/configure-vscode.sh} # Configure VS Code
+          source ${./scripts/vscode.sh} # Configure VS Code
         '';
       };
     });
