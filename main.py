@@ -1,101 +1,72 @@
 #!/usr/bin/env python
+# Standard Imports
+from pathlib import Path
+
+# Third Party Imports
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.gzip import GZipMiddleware
-
-from pathlib import Path
 import uvicorn
-import asyncio
-from datetime import datetime
+from starlette.templating import _TemplateResponse
 
-from datastar_py import ServerSentEventGenerator as SSE, attribute_generator as data
-from datastar_py.fastapi import datastar_response, read_signals
+# My Impors
+from monotes.routes import router as routes
 
-from mohtml import (
-    span,  # pyrefly: ignore
-    html,  # pyrefly: ignore
-    head,  # pyrefly: ignore
-    script,  # pyrefly: ignore
-    body,  # pyrefly: ignore
-    link,  # pyrefly: ignore
-)
-
-from monotes.elements import note, button_note
-
+# ---------Setup-App---------------#
 # Discover the base directory relative to this file
-BASE_DIR = Path(__file__).parent
-
-app = FastAPI()
+BASE_DIR: Path = Path(__file__).parent
+# Create FastAPI app
+app: FastAPI = FastAPI()
 app.add_middleware(
     GZipMiddleware,  # pyrefly: ignore
-    minimum_size=1000,
+    minimum_size=500,
     compresslevel=9,
 )
-
+# Add static files
 app.mount(
     "/style",
     StaticFiles(directory=BASE_DIR / "style", follow_symlink=True),
     name="style",
 )
+# Create Jinja2 templates
+templates: Jinja2Templates = Jinja2Templates(directory=BASE_DIR / "style" / "templates")
 
-templates = Jinja2Templates(directory=BASE_DIR / "style" / "templates")
 
-
+# ---------Default-Routes---------#
 @app.get("/", response_class=HTMLResponse)
-async def read_index(request: Request):
+async def read_index(
+    request: Request,
+) -> _TemplateResponse:
     return templates.TemplateResponse(request=request, name="index.html", context={})
 
 
 @app.get("/favicon.ico")
-async def favicon(request: Request):
+async def favicon(request: Request) -> FileResponse:
     return FileResponse(BASE_DIR / "style" / "assets" / "favicon.ico")
 
 
 @app.get("/health")
-async def health(request: Request):
+async def health(request: Request) -> dict[str, str]:
     return {"status": "ok"}
 
 
-@app.get("/data", response_class=HTMLResponse)
-def index(request: Request) -> str:
-    return str(
-        html(
-            head(
-                script(
-                    type="module",
-                    src="https://cdn.jsdelivr.net/gh/starfederation/datastar@main/bundles/datastar.js",
-                ),
-                link(href="./style/output.css", rel="stylesheet"),
-            ),
-            body(
-                span(id="currentTime"),
-                span(data_text="$currentTime"),
-                button_note(),
-                data_on_load="@get('/updates')",
-                klass="bg-pink-500",
-            ),
-        )
-    )
+# ---------Home-Routes-----------#
+@app.get("/note", response_class=HTMLResponse)
+async def note_home(request: Request) -> _TemplateResponse:
+    return templates.TemplateResponse(request=request, name="note.html", context={})
 
 
-@app.get("/updates")
-@datastar_response
-async def updates(request: Request):
-    # Retrieve a dictionary with the current state of the signals from the frontend
-    # signals = await read_signals(request)  # pyrefly: ignore
-    # Alternate updating an element from the backend, and updating a signal from the backend
-    while True:
-        yield SSE.patch_elements(
-            f"""<span id="currentTime">{datetime.now().isoformat()}"""
-        )
-        await asyncio.sleep(1)
-        yield SSE.patch_signals({"currentTime": f"{datetime.now().isoformat()}"})
-        await asyncio.sleep(1)
-
+# ---------API-Routes---------#
+app.include_router(routes)
 
 if __name__ == "__main__":
     uvicorn.run(
-        "main:app", host="0.0.0.0", port=7999, workers=3, timeout_graceful_shutdown=5
+        "main:app",
+        host="0.0.0.0",
+        port=7999,
+        workers=3,
+        timeout_graceful_shutdown=10,
+        use_colors=True,
     )

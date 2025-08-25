@@ -1,1 +1,1 @@
-from .note import note, button_note  # noqa: F401
+from .note import note  # noqa: F401

@@ -1,22 +1,21 @@
 import marimo as mo
-from mohtml import div, p, span, h1, h2, h3, button, a  # pyrefly: ignore
+from mohtml import div, p, span, h1, h2, h3, button, a, textarea  # pyrefly: ignore
 from datastar_py import attribute_generator as data
 
 
-def note(text: str) -> div:
-    return div(
-        p(text),
-        klass="text-sm text-green-700 bg-green-100 p-4 rounded-lg",
-        data=data.on_load("@get('/update')"),
-    )
-
-
-data_on_click = data.on("click", "alert('Alert!')")
-
-
-def button_note() -> None:
-    return button(
-        "Click me!",
-        data_on_click="alert('Alert!')",
-        klass="bg-green-500 hover:bg-blue-700 text-black hover:text-yellow-400 font-bold py-2 px-4 rounded-b-2xl",
+def note(text: str) -> str:
+    """
+    Generates a cloud sticky note HTML element with a glassy, modern UI.
+    Uses the 'spaceduck' theme and is responsive.
+    """
+    return str(
+        div(
+            textarea(
+                text,
+                data_bind="note_text",
+                klass="text-base text-[var(--base05)] glow-text glass-card p-6 rounded-xl shadow-lg w-full min-h-[calc(100vh-2rem)] transition-all duration-300 hover:shadow-xl hover:scale-[1.02] flex flex-col justify-between items-start space-y-4",
+            ),
+            id="note",
+            klass="flex justify-center items-center min-h-screen p-10",  # Centering div with padding
+        )
     )
