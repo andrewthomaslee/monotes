@@ -67,11 +67,5 @@ fi
 tmux new-session -d -s $SESSION_NAME -n "📦_Container" -c "$REPO_ROOT"
 tmux send-keys -t $SESSION_NAME:0 "docker run --rm -p 7999:7999 -it "$IMAGE_TAG" sh" C-m
 
-tmux new-window -t $SESSION_NAME -n "🪵_Lazydocker" -c "$REPO_ROOT"
-tmux send-keys -t $SESSION_NAME:1 "lazydocker" C-m
-
-tmux new-window -t $SESSION_NAME -n "🦁_Brave" -c "$REPO_ROOT"
-tmux send-keys -t $SESSION_NAME:2 "brave --user-data-dir=/tmp/brave-dev-container --new-window --incognito http://0.0.0.0:7999" C-m
-
 echo "Tmux created session ✨'$SESSION_NAME'✨"
 tmux attach-session -t $SESSION_NAME

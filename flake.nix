@@ -133,7 +133,7 @@
         fromImage = alpine;
         contents = [pkgs.curl];
         config = {
-          Entrypoint = ["${monotes-package}/main.py"];
+          Cmd = ["${monotes-package}/main.py"];
           ExposedPorts = {"7999/tcp" = {};};
           Healthcheck = {
             Test = ["CMD-SHELL" "curl -f http://localhost:7999/health || exit 1"];
