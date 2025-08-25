@@ -96,8 +96,22 @@
       pkgs = nixpkgs.legacyPackages.${system};
       pythonSet = pythonSets.${system};
       venv = pythonSet.mkVirtualEnv "monotes-venv" workspace.deps.default;
-    in {
-      default = pkgs.stdenv.mkDerivation {
+      # alpine base docker image
+      alpine = pkgs.dockerTools.pullImage {
+        imageName = "alpine";
+        imageDigest = "sha256:4bcff63911fcb4448bd4fdacec207030997caf25e9bea4045fa6c8c44de311d1";
+        finalImageName = "alpine";
+        finalImageTag = "latest";
+        sha256 = "sha256-1Af8p6cYQs8sxlowz4BC6lC9eAOpNWYnIhCN7BSDKL0=";
+        os = "linux";
+        arch =
+          if system == "x86_64-linux"
+          then "amd64"
+          else if system == "aarch64-linux"
+          then "arm64"
+          else system;
+      };
+      monotes-package = pkgs.stdenv.mkDerivation {
         name = "monotes-package";
         src = ./.;
         buildInputs = [venv];
@@ -111,7 +125,23 @@
           patchShebangs $out/main.py
         '';
       };
+    in {
+      default = monotes-package;
+      container = pkgs.dockerTools.buildLayeredImage {
+        name = "monotes-container";
+        created = "now";
+        fromImage = alpine;
+        contents = [pkgs.curl];
+        config = {
+          Entrypoint = ["${monotes-package}/main.py"];
+          ExposedPorts = {"7999/tcp" = {};};
+          Healthcheck = {
+            Test = ["CMD-SHELL" "curl -f http://localhost:7999/health || exit 1"];
+          };
+        };
+      };
     });
+
     # Dynamic script discovery for .sh and .py files
     apps = forAllSystems (
       system: let

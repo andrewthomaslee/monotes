@@ -11,9 +11,12 @@ def note(text: str) -> div:
     )
 
 
+data_on_click = data.on("click", "alert('Alert!')")
+
+
 def button_note() -> None:
     return button(
         "Click me!",
-        data_on_click="alert('I'm sorry, Dave. I'm afraid I can't do that.')",
-        klass="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded",
+        data_on_click="alert('Alert!')",
+        klass="bg-green-500 hover:bg-blue-700 text-black hover:text-yellow-400 font-bold py-2 px-4 rounded-b-2xl",
     )

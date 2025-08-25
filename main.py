@@ -19,7 +19,10 @@ from mohtml import (
     head,  # pyrefly: ignore
     script,  # pyrefly: ignore
     body,  # pyrefly: ignore
+    link,  # pyrefly: ignore
 )
+
+from monotes.elements import note, button_note
 
 # Discover the base directory relative to this file
 BASE_DIR = Path(__file__).parent
@@ -63,13 +66,15 @@ def index(request: Request) -> str:
                 script(
                     type="module",
                     src="https://cdn.jsdelivr.net/gh/starfederation/datastar@main/bundles/datastar.js",
-                )
+                ),
+                link(href="./style/output.css", rel="stylesheet"),
             ),
             body(
                 span(id="currentTime"),
                 span(data_text="$currentTime"),
+                button_note(),
                 data_on_load="@get('/updates')",
-                klass="bg-blue-900",
+                klass="bg-pink-500",
             ),
         )
     )
@@ -91,4 +96,6 @@ async def updates(request: Request):
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=7999)
+    uvicorn.run(
+        "main:app", host="0.0.0.0", port=7999, workers=3, timeout_graceful_shutdown=5
+    )
