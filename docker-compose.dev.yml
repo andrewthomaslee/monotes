@@ -4,11 +4,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    restart: unless-stopped
+    restart: never
     tty: true
     stdin_open: true
     networks:
       - default
+    ports:
+      - 7999:7999
 
 networks:
   default:
