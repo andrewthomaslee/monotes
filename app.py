@@ -13,13 +13,26 @@ app = marimo.App(
 with app.setup:
     # Initialization code that runs before all other cells
     import marimo as mo
-    from mohtml import div, p, span, h1, h2, h3, a, button, script, head
+    from mohtml import (
+        div,  # pyrefly: ignore
+        p,  # pyrefly: ignore
+        span,  # pyrefly: ignore
+        h1,  # pyrefly: ignore
+        h2,  # pyrefly: ignore
+        h3,  # pyrefly: ignore
+        a,  # pyrefly: ignore
+        button,  # pyrefly: ignore
+        script,  # pyrefly: ignore
+        head,  # pyrefly: ignore
+    )
     from monotes.elements import note, button_note
 
 
 @app.cell
 def _():
-    head("""<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@main/bundles/datastar.js"></script>""")
+    head(
+        """<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@main/bundles/datastar.js"></script>"""
+    )
     return
 
 

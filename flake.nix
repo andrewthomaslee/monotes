@@ -47,6 +47,7 @@
     pythonSets = forAllSystems (
       system: let
         pkgs = nixpkgs.legacyPackages.${system};
+        inherit (pkgs.stdenv) mkDerivation;
         python = pkgs.python313;
         baseSet = pkgs.callPackage pyproject-nix.build.packages {
           inherit python;
@@ -68,19 +69,48 @@
                     in
                       (old.tests or {})
                       // {
-                        pytest = pkgs.stdenv.mkDerivation {
+                        pytest = mkDerivation {
                           name = "${final.monotes.name}-pytest";
                           inherit (final.monotes) src;
                           nativeBuildInputs = [virtualenv];
                           dontConfigure = true;
                           buildPhase = ''
                             runHook preBuild
-                            pytest --junit-xml=pytest.xml
+                            pytest --cov tests --cov-report html tests
                             runHook postBuild
                           '';
                           installPhase = ''
                             runHook preInstall
-                            mv pytest.xml $out
+                            mv htmlcov $out
+                            runHook postInstall
+                          '';
+                        };
+                        pyrefly = mkDerivation {
+                          name = "${final.monotes.name}-pyrefly";
+                          inherit (final.monotes) src;
+                          nativeBuildInputs = [virtualenv];
+                          dontConfigure = true;
+                          dontInstall = true;
+                          buildPhase = ''
+                            runHook preBuild
+                            mkdir $out
+                            pyrefly check --debug-info $out/pyrefly.json --output-format json --config pyproject.toml
+                            runHook postBuild
+                          '';
+                        };
+                        ruff = mkDerivation {
+                          name = "${final.monotes.name}-ruff";
+                          inherit (final.monotes) src;
+                          nativeBuildInputs = [virtualenv];
+                          dontConfigure = true;
+                          buildPhase = ''
+                            runHook preBuild
+                            ruff check --ignore F401 --output-format json -o ruff.json
+                            runHook postBuild
+                          '';
+                          installPhase = ''
+                            runHook preInstall
+                            mv ruff.json $out
                             runHook postInstall
                           '';
                         };
@@ -292,7 +322,7 @@
     checks = forAllSystems (system: let
       pythonSet = pythonSets.${system};
     in {
-      inherit (pythonSet.monotes.passthru.tests) pytest;
+      inherit (pythonSet.monotes.passthru.tests) pytest pyrefly ruff;
     });
 
     formatter = forAllSystems (

@@ -26,6 +26,7 @@ dev = [
     "pydantic-settings>=2.10.1",
     "pyrefly>=0.29.2",
     "pytest>=8.4.1",
+    "pytest-cov>=6.2.1",
     "python-lsp-server>=1.13.0",
     "ruff>=0.12.8",
     "watchdog>=6.0.0",
