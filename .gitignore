@@ -9,3 +9,4 @@ result
 output.css
 docker
 .ruff_cache
+.vscode

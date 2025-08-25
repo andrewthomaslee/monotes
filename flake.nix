@@ -200,9 +200,12 @@
       # Packages to install in devShells
       devPackages = with pkgs;
         [
+          bash
+          jq
           uv
           tailwindcss_4
           watchman
+          posting
           yazi
           lazydocker
           brave
@@ -229,7 +232,7 @@
         shellHook = ''
           unset PYTHONPATH
           export REPO_ROOT=$(git rev-parse --show-toplevel)
-          ${pkgs.uv}/bin/uv sync
+          uv sync
           source .venv/bin/activate
         '';
       };
@@ -248,7 +251,9 @@
         shellHook = ''
           unset PYTHONPATH
           export REPO_ROOT=$(git rev-parse --show-toplevel)
+          export VIRTUAL_ENV=${virtualenvDev}
           source ${virtualenvDev}/bin/activate
+          source ${./scripts/configure-vscode.sh} # Configure VS Code
         '';
       };
     });
@@ -259,5 +264,12 @@
     in {
       inherit (pythonSet.monotes.passthru.tests) pytest;
     });
+
+    formatter = forAllSystems (
+      system: let
+        pkgs = nixpkgs.legacyPackages.${system};
+      in
+        pkgs.alejandra
+    );
   };
 }
