@@ -1,32 +1,13 @@
 # Standard Imports
-from typing import Any
-from datetime import datetime
 
 # Third Party Imports
-from fastapi import APIRouter, Request
-from fastapi.responses import HTMLResponse
-from datastar_py import ServerSentEventGenerator as SSE
-from datastar_py.fastapi import datastar_response, read_signals, DatastarResponse
-import marimo as mo
 from mohtml import (
     div,  # pyrefly: ignore
-    p,  # pyrefly: ignore
-    span,  # pyrefly: ignore
-    h1,  # pyrefly: ignore
-    h2,  # pyrefly: ignore
-    h3,  # pyrefly: ignore
     button,  # pyrefly: ignore
-    a,  # pyrefly: ignore
     textarea,  # pyrefly: ignore
-    input,  # pyrefly: ignore
 )
-# My Imports
 
-# ------------------Setup-------------------#
-router: APIRouter = APIRouter(
-    prefix="/note",
-    tags=["note"],
-)
+# My Imports
 
 
 # ------------------Elements-------------------#
@@ -59,17 +40,3 @@ def submit_note_button() -> str:
             klass="glass-button text-[var(--base05)] hover:text-[var(--base07)] font-bold py-2 px-4 rounded-lg text-sm",
         )
     )
-
-
-# ------------------Routes-------------------#
-@router.get("/", response_class=HTMLResponse)
-async def read_index(request: Request) -> DatastarResponse:
-    return DatastarResponse(
-        [SSE.patch_elements(note(f"Hello World @ {datetime.now().isoformat()}"))]
-    )
-
-
-@router.post("/submit")
-async def submit_note(request: Request):
-    signals: dict[str, Any] | None = await read_signals(request)
-    print(signals)

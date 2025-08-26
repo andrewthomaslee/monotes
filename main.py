@@ -12,7 +12,7 @@ import uvicorn
 from starlette.templating import _TemplateResponse
 
 # My Impors
-from monotes.routes import router as routes
+from monotes import router
 
 # ---------Setup-App---------------#
 # Discover the base directory relative to this file
@@ -59,7 +59,7 @@ async def note_home(request: Request) -> _TemplateResponse:
 
 
 # ---------API-Routes---------#
-app.include_router(routes)
+app.include_router(router)
 
 if __name__ == "__main__":
     uvicorn.run(
