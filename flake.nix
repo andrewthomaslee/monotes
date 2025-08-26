@@ -148,7 +148,7 @@
         installPhase = ''
           mkdir -p $out/style
           cp -r ${./style}/* $out/style/
-          ${pkgs.tailwindcss_4}/bin/tailwindcss -i ${./style/input.css} -o ./style/output.css
+          ${pkgs.tailwindcss_4}/bin/tailwindcss -i ${./style/input.css} -o ./style/output.css --minify
           cp ./style/output.css $out/style/output.css
           cp ${./main.py} $out/main.py
           chmod +x $out/main.py
