@@ -73,8 +73,8 @@ build_and_show() {
         
         # Check if results exist
         if [[ -d "result" ]]; then
-            echo -e "${BLUE}📊 Opening test results in Brave...${NC}"
-            brave result/index.html 2>/dev/null || echo -e "${YELLOW}⚠️  Could not open Brave. Results available at: result/index.html${NC}"
+            echo -e "${BLUE}📊 Opening test results in Chrome...${NC}"
+            chromium result/index.html 2>/dev/null || echo -e "${YELLOW}⚠️  Could not open chromium. Results available at: result/index.html${NC}"
         else
             echo -e "${YELLOW}⚠️  No test results found in result/ directory${NC}"
         fi

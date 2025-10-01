@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+
+{% block title %}BFF Logger{% endblock %}
+
+{% block content %}
+    
+<!-- Top Banner -->
+<header class="top-banner">
+    <div class="top-banner-inner">
+        <!-- Left Side: Username -->
+        <div class="banner-username-display">
+            {{ request.session.get('username') }}
+        </div>
+
+        <!-- Right Side: Actions -->
+        <div class="banner-actions">
+            {% if request.session.get('admin') == True %}
+            <button class="btn-header-admin"
+                data-signals="{show_signals: false}"
+                data-on-click="$show_signals = !$show_signals"
+                data-class-active="$show_signals"
+                >SIGNALS
+            </button>
+            <button class="btn-header-admin"
+                data-signals="{show_session: false}"
+                data-on-click="$show_session = !$show_session"
+                data-class-active="$show_session"
+                >SESSION
+            </button>
+            <a href="/admin/dashboard/" class="btn-header-admin">Admin Panel</a>
+            {% endif %}
+            
+            <!-- Theme Toggle Button -->
+            <button class="theme-toggle-btn" data-on-click="@get('/settings/dark_mode/')" aria-label="Toggle theme">
+                <!-- Icon SVGs -->
+                {% if request.session.get('dark_mode') == True %}
+                <svg class="theme-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                {% else %}
+                <svg class="theme-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                {% endif %}
+            </button>
+
+            <button class="btn-header"
+                data-on-click="@get('/logout')"
+                >Sign Out
+            </button>
+        </div>
+    </div>
+</header>
+
+
+<div class="content-wrapper" id="content-wrapper">
+    <!-- Debug Panel Sidebar -->
+    {% if request.session.get('admin') == True %}
+    <aside id="debug-panel" class="debug-panel-card" style="display: none" data-show="$show_session || $show_signals">
+        
+        <pre style="display: none" class="json-code-block" data-json-signals data-show="$show_signals"></pre>
+        <div style="display: none" class="json-code-block" data-show="$show_session">
+            {% for key, value in request.session.items() %}
+            <div class="flex flex-wrap">
+                <span class="session-key">{{ key }}</span>: <span class="session-value break-all">{{ value }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </aside>
+    <!-- Redirect after Log -->
+    <div style="display: none"
+        data-on-signal-patch-filter="{include: /^redirect_after$/}"
+        data-on-signal-patch="@get('/'), $redirect_after = false , @setAll('', {include: '/^prompt_*/', exclude: '/^prompt_machine_name$/'})"
+        data
+    ></div>
+    {% else %}
+    <div style="display: none"
+        data-on-signal-patch-filter="{include: /^redirect_after$/}"
+        data-on-signal-patch="@get('/logout')"
+    ></div>
+    {% endif %}
+
+
+    <!-- Main Content Body-->
+    <main class="main-content" id="main-content">
+
+        <!-- Check Out Form -->
+        {% if request.session.get('active') == False %}
+        <div id="packer_form" class="checkout-card">
+
+            <!-- Header -->
+            <h2 class="checkout-heading">Take this machine:</h2>
+
+            <!-- Machine Info Display -->
+            <div class="machine-info">
+                <div class="machine-name-display"
+                data-text="$prompt_machine_name"
+                data-signals-fetching="true"
+                data-indicator="fetching"
+                data-on-load="@get('/packer/check_out/get_machine/')"
+                ></div>
+                <svg data-show="$fetching && $prompt_machine_name === ''" style="display: none"  xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="16" stroke-dashoffset="16" d="M12 3c4.97 0 9 4.03 9 9"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.3s" values="16;0"/><animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></path><path stroke-dasharray="64" stroke-dashoffset="64" stroke-opacity="0.3" d="M12 3c4.97 0 9 4.03 9 9c0 4.97 -4.03 9 -9 9c-4.97 0 -9 -4.03 -9 -9c0 -4.97 4.03 -9 9 -9Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="1.2s" values="64;0"/></path></g></svg>
+                <button class="btn-header-admin"
+                    data-on-click="@get('/packer/check_out/report_missing_machine/')"
+                    >Missing?
+                </button>
+            </div>
+
+            <!-- Task Selection Grid -->
+            <div class="task-grid">
+                {% for task in tasks %}
+                <button class="btn-task"
+                    data-class-selected="$prompt_task === '{{ task }}'"
+                    data-on-click="$prompt_task = '{{ task }}'"
+                    >{{ task.replace('_', ' ').title() }}
+                </button>
+                {% endfor %}
+            </div>
+
+            <!-- Sliders for Battery and Condition -->
+            <div class="space-y-6 pt-4">
+                <!-- Battery Slider -->
+                <div class="slider-container">
+                    <label for="battery" class="slider-label">
+                        <span>Battery:</span>
+                        <span 
+                            data-signals="{prompt_battery: 75}"
+                            data-text="$prompt_battery"
+                        ></span>
+                    </label>
+                    <input type="range" id="battery" name="battery" min="0" max="100" value="75" class="range-slider"
+                    data-bind="prompt_battery">
+                </div>
+                <!-- Condition Slider -->
+                <div class="slider-container">
+                    <label for="condition" class="slider-label">
+                        <span>Condition:</span>
+                        <span
+                            data-signals="{prompt_condition: 4}"
+                            data-text="$prompt_condition"
+                        ></span>
+                    </label>
+                    <input type="range" id="condition" name="condition" min="0" max="5" value="4" class="range-slider"
+                    data-bind="prompt_condition">
+                </div>
+            </div>
+            
+            <!-- Special Note Textarea -->
+            <div class="pt-6">
+                <label for="special_note" class="form-label">Special Note</label>
+                <textarea id="special_note" name="special_note" class="form-input" rows="4" placeholder="Add any notes here..."
+                    data-bind="prompt_special_note"
+                ></textarea>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="form-actions mt-4">
+                <button class="btn btn-secondary"
+                    data-signals="{show_json: false}"
+                    data-on-click="$show_json = !$show_json"
+                    >JSON
+                </button>
+                <button type="reset" class="btn btn-secondary"
+                    data-on-click="$prompt_condition = 4, $prompt_battery = 75, $prompt_special_note = '', $prompt_task = ''"
+                    >Reset
+                </button>
+                <button type="submit" class="btn btn-primary"
+                    data-on-click="@post('/packer/check_out/', {include: /^prompt_*/})"
+                    data-on-datastar-fetch="evt.detail.type === 'error' && @setAll(true, {include: /^failed_request$/})"
+                    data-attr-disabled="$prompt_task === ''"
+                    data-class-disabled="$prompt_task === ''"
+                    >Check Out
+                </button>
+            </div>
+
+            <div data-signals="{failed_request: false}" data-show="$failed_request" style="display: none" class="form-error">
+                <p>Bad sumbit. Please try again.</p>
+            </div>
+
+            <!-- JSON Code Block -->
+            <pre style="display: none" class="json-code-block" data-json-signals="{include: /^prompt_*/}" data-show="$show_json"></pre>
+        </div>
+        {% else %}
+        <!-- Check In Form -->
+        <div id="packer_form" class="checkout-card">
+
+            <!-- Header -->
+            <h2 class="checkout-heading">Check In machine:</h2>
+
+            <!-- Machine Name Input -->
+            <div class="pt-2">
+                <label for="machine_name_in" class="sr-only">Machine Name</label>
+                <input type="text" id="machine_name_in" name="machine_name" class="form-input machine-name-input" placeholder="Machine Name" required
+                data-bind="prompt_machine_name">
+            </div>
+
+            <!-- Sliders for Battery and Condition -->
+            <div class="space-y-6 pt-6">
+                <!-- Battery Slider -->
+                <div class="slider-container">
+                    <label for="battery_in" class="slider-label">
+                        <span>Battery:</span>
+                        <span
+                            data-signals="{prompt_battery: 75}"
+                            data-text="$prompt_battery"
+                        ></span> 
+                    </label>
+                    <input type="range" id="battery_in" name="battery" min="0" max="100" value="75" class="range-slider"
+                    data-bind="prompt_battery">
+                </div>
+                <!-- Condition Slider -->
+                <div class="slider-container">
+                    <label for="condition_in" class="slider-label">
+                        <span>Condition:</span>
+                        <span
+                            data-signals="{prompt_condition: 4}"
+                            data-text="$prompt_condition"
+                        ></span>
+                    </label>
+                    <input type="range" id="condition_in" name="condition" min="0" max="5" value="4" class="range-slider"
+                    data-bind="prompt_condition">
+                </div>
+            </div>
+            
+            <!-- Special Note Textarea -->
+            <div class="pt-6">
+                <label for="special_note_in" class="form-label">Special Note</label>
+                <textarea id="special_note_in" name="special_note" class="form-input" rows="4" placeholder="Add any notes here..."
+                    data-bind="prompt_special_note"
+                ></textarea>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="form-actions mt-4">
+                <button class="btn btn-secondary"
+                    data-signals="{show_json: false}"
+                    data-on-click="$show_json = !$show_json"
+                    >JSON
+                </button>
+                <button type="reset" class="btn btn-secondary"
+                    data-on-click="$prompt_condition = 4, $prompt_battery = 75, $prompt_special_note = '', $prompt_machine_name = ''"
+                    >Reset
+                </button>
+                <button type="submit" class="btn btn-primary"
+                    data-on-click="@post('/packer/check_in/', {include: /^prompt_*/})"
+                    data-attr-disabled="$prompt_machine_name === ''"
+                    data-class-disabled="$prompt_machine_name === ''"
+                    >Check In
+                </button>
+            </div>
+            <div style="display: none" class="form-error"
+                data-show="$bad_machine_input"
+            ><p>Bad machine input. Please try again.</p></div>
+
+            <!-- JSON Code Block -->
+            <pre style="display: none" class="json-code-block" data-json-signals="{include: /^prompt_*/}" data-show="$show_json"></pre>
+
+        </div>
+        {% endif %}
+    </main>
+</div>
+{% endblock %}

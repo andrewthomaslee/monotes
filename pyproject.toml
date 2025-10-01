@@ -1,34 +1,42 @@
 [project]
-name = "monotes"
+name = "bff-demo"
 version = "0.1.0"
-description = "Add your description here"
+description = "Packer Logs with Admin Dashboard"
 readme = "README.md"
 authors = [
-    { name = "andrewthomaslee", email = "andrewthomaslee.business@gmail.com" },
+    { name = "Andrew Thomas Lee", email = "andrewthomaslee.business@gmail.com" }
 ]
 requires-python = ">=3.13"
 dependencies = [
+    "beanie>=2.0.0",
     "datastar-py>=0.6.5",
-    "fastapi>=0.116.1",
+    "duckdb>=1.4.0",
+    "fastapi[standard]>=0.116.2",
     "jinja2>=3.1.6",
-    "marimo>=0.15.0",
-    "mohtml>=0.1.11",
-    "uvicorn>=0.35.0",
+    "pydantic-settings>=2.10.1",
+    "pymongo>=4.15.1",
+    "pytz>=2025.2",
+    "starlette[full]>=0.48.0",
 ]
-
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = [
-    "marimo[recommended]>=0.15.0",
-    "pydantic-settings>=2.10.1",
-    "pyrefly>=0.29.2",
-    "pytest>=8.4.1",
-    "pytest-cov>=6.2.1",
-    "python-lsp-server>=1.13.0",
-    "ruff>=0.12.8",
-    "watchdog>=6.0.0",
-    "websockets>=15.0.1",
+    "pyrefly>=0.33.1",
+    "pytest>=8.4.2",
+    "pytest-cov>=7.0.0",
+    "ruff>=0.13.1",
 ]
+
+[tool.setuptools]
+packages = []
+
+
+[tool.ruff]
+line-length = 101
+target-version = "py313"
+lint.ignore = ["E712"]
+
+
+
+[tool.pyrefly]
+project-includes = ["app/**/*", "main.py"]

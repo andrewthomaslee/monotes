@@ -7,7 +7,7 @@ if [ -z "$REPO_ROOT" ]; then
 fi
 cd $REPO_ROOT
 
-SESSION_NAME="nixfastapi-dev"
+SESSION_NAME="duckdb-ui"
 
 # Function to handle user choice when session exists
 handle_existing_session() {
@@ -55,25 +55,11 @@ if tmux has-session -t $SESSION_NAME 2>/dev/null; then
 fi
 
 
-docker pull mongo:8.0.13
+tmux new-session -d -s $SESSION_NAME -n "mitmproxy" -c "$REPO_ROOT/data"
+tmux send-keys -t $SESSION_NAME:0 "mitmdump --mode reverse:https://ui.duckdb.org -w hatchling.dump" C-m
 
-tmux new-session -d -s $SESSION_NAME -n "💨_Tailwind" -c "$REPO_ROOT/app"
-tmux send-keys -t $SESSION_NAME:0 "tailwindcss -i ./style/input.css -o ./style/output.css --watch" C-m
-
-tmux new-window -t $SESSION_NAME -n "🪵_Lazydocker" -c "$REPO_ROOT"
-tmux send-keys -t $SESSION_NAME:1 "lazydocker" C-m
-
-tmux new-window -t $SESSION_NAME -n "🥭_MongoDB" -c "$REPO_ROOT"
-tmux send-keys -t $SESSION_NAME:2 "docker run --rm -p 27017:27017 -v ./data/mongo:/data/db --name mongo mongo:8.0.13 | jq" C-m
-
-tmux new-window -t $SESSION_NAME -n "🧭_Compass" -c "$REPO_ROOT"
-tmux send-keys -t $SESSION_NAME:3 "mongodb-compass --trustedConnectionString mongodb://localhost:27017 --autoUpdates false" C-m
-
-tmux new-window -t $SESSION_NAME -n "🌐_Chrome" -c "$REPO_ROOT"
-tmux send-keys -t $SESSION_NAME:4 "chromium --user-data-dir=/tmp/chrome-dev --new-window --incognito --disable-cache --disk-cache-size=0 --media-cache-size=0 --remote-debugging-port=9222 http://0.0.0.0:8000" C-m
-
-tmux new-window -t $SESSION_NAME -n "🐍_FastAPI" -c "$REPO_ROOT"
-tmux send-keys -t $SESSION_NAME:5 "uvicorn app.app:app --port 8000 --host 0.0.0.0 --reload --timeout-keep-alive 1 --timeout-graceful-shutdown 1 --reload-delay 0.5 --reload-dir ./app --log-level debug" C-m
+tmux new-window -t $SESSION_NAME -n "🦆_duckdb-ui" -c "$REPO_ROOT/data"
+tmux send-keys -t $SESSION_NAME:1 "ui_remote_url=http://localhost:8080 duckdb -cmd \"INSTALL ui; LOAD ui;\" -ui -unsigned duck.db" C-m
 
 echo "Tmux created session ✨'$SESSION_NAME'✨"
 tmux attach-session -t $SESSION_NAME

@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Create User{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="form-card">
+        <h1 class="form-heading">Create New User</h1>
+
+        <!-- Form now uses a vertical stack -->
+        <div class="form-stack">
+            
+            <!-- Name Field -->
+            <div class="form-group">
+                <label for="name" class="form-label required">Name</label>
+                <input data-bind="user_create_name" type="text" id="name" name="name" class="form-input" placeholder="e.g., Jane Doe" required>
+            </div>
+
+            <!-- Password Field -->
+            <div class="form-group">
+                <label for="password" class="form-label required">Password</label>
+                <input data-bind="user_create_password"  type="password" id="password" name="password" class="form-input" placeholder="••••••••" required>
+            </div>
+
+            <!-- Admin Selector -->
+            <div class="form-group">
+                <label for="admin" class="form-label">Admin</label>
+                <select data-bind="user_create_admin" id="admin" name="admin" class="form-input">
+                    <option value="false" selected>False</option>
+                    <option value="true">True</option>
+                </select>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="form-actions">
+                <button class="btn btn-secondary"
+                data-on-click="$showjson = !$showjson"
+                >JSON</button>
+                <button type="reset" class="btn btn-secondary"
+                data-on-click="$user_create_password = '', $user_create_name = '', $user_create_admin = 'false'"
+                >Reset</button>
+                <button class="btn btn-primary" 
+                data-on-click="@post('/api/users/create/', { filterSignals : '/^user_create_.*/'}), $user_create_password = '', $user_create_name = '', $user_create_admin = false"
+                data-on-datastar-fetch="
+                    evt.detail.type === 'started' && @setAll(false, {include: /^(user_failed|user_success)$/}),
+                    evt.detail.type === 'error' && @setAll(true, {include: /^user_failed$/}),
+                    evt.detail.type === 'finished' && !$user_failed && @setAll(true, {include: /^user_success$/})
+                ">
+                Create User
+                </button>
+            </div>
+            <pre data-signals="{showjson: false}" data-json-signals="{include: /^user_create_.*/}" data-show="$showjson" style="display: none" class="json-code-block">
+
+            </pre>
+            <!-- Error Message -->
+            <div data-signals="{user_failed: false}" data-show="$user_failed" style="display: none" class="form-error">
+                <p>Failed to create user. Please try again.</p>
+            </div>
+            <!-- Success Message -->
+            <div data-on-interval__duration.10s="$user_success = false" data-signals="{user_success: false}" data-show="$user_success" style="display: none" class="form-success">
+                <p>Successfully created user.</p>
+            </div>
+                
+            
+        </div>
+    </div>
+</div>
+{% endblock %}

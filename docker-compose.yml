@@ -1,11 +1,34 @@
 services:
-  monotes:
-    container_name: monotes-container
+
+  mongo:
+    image: mongo:8.0.13
+    restart: unless-stopped
+    networks:
+      - backend
+    volumes:
+      - mongo-data:/data/db
+
+  bff-demo:
     build:
       context: .
       dockerfile: Dockerfile
     restart: unless-stopped
+    depends_on:
+      - mongo
+    environment:
+      - DB_URI=${DB_URI:-mongodb://mongo}
+      - SECRET_KEY=${SECRET_KEY:-should-be-changed}
+      - FAKE_DATA=${FAKE_DATA:-True}
+    networks:
+      - backend
     tty: true
     stdin_open: true
     ports:
       - ${PORTS:-7999}:7999
+
+volumes:
+  mongo-data:
+
+networks:
+  backend:
+    driver: bridge

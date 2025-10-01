@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="form-card">
+        <h1 class="form-heading">Login</h1>
+
+        <!-- Display error message if it exists -->
+        {% if error %}
+        <div class="form-error mb-4">
+            <p>{{ error }}</p>
+        </div>
+        {% endif %}
+
+        <form action="/login" method="post" class="form-stack">
+            <!-- Username Field -->
+            <div class="form-group">
+                <label for="username" class="form-label required">Username</label>
+                <input type="text" id="username" name="username" required class="form-input" placeholder="Enter your username" />
+            </div>
+            
+            <!-- Password Field -->
+            <div class="form-group">
+                <label for="password" class="form-label required">Password</label>
+                <input type="password" id="password" name="password" required class="form-input" placeholder="••••••••" />
+            </div>
+
+            <!-- Full-width Login Button -->
+            <button type="submit" class="btn btn-primary w-full mt-4">Login</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

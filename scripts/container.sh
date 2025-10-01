@@ -11,10 +11,10 @@ cd $REPO_ROOT
 # 1. Build → 2. Load → 3. Run (with auto-cleanup)
 
 echo "🚀 Building Docker image with Nix..."
-nix build .#container
+nix build .#bff-demo-container
 
 echo "📥 Loading image into Docker..."
-IMAGE_TAG=$(docker load < result | grep -o 'monotes-container:[^ ]*')
+IMAGE_TAG=$(docker load < result | grep -o 'bff-demo-container:[^ ]*')
 
 
 SESSION_NAME="nixfastapi-container"
@@ -64,14 +64,20 @@ if tmux has-session -t $SESSION_NAME 2>/dev/null; then
     handle_existing_session
 fi
 
-tmux new-session -d -s $SESSION_NAME -n "📦_Container" -c "$REPO_ROOT"
-tmux send-keys -t $SESSION_NAME:0 "docker run --rm -p 7999:7999 "$IMAGE_TAG"" C-m
+docker network create --driver bridge dev-nixfastapi-network 2>/dev/null || true
+docker pull mongo:8.0.13
 
-tmux new-window -t $SESSION_NAME -n "🪵_Lazydocker" -c "$REPO_ROOT"
-tmux send-keys -t $SESSION_NAME:1 "lazydocker" C-m
+tmux new-session -d -s $SESSION_NAME -n "🪵_Lazydocker" -c "$REPO_ROOT"
+tmux send-keys -t $SESSION_NAME:0 "lazydocker" C-m
 
-tmux new-window -t $SESSION_NAME -n "🦁_Brave" -c "$REPO_ROOT"
-tmux send-keys -t $SESSION_NAME:2 "brave --user-data-dir=/tmp/brave-dev-container --new-window --incognito http://0.0.0.0:7999" C-m
+tmux new-window -t $SESSION_NAME -n "🥭_MongoDB" -c "$REPO_ROOT"
+tmux send-keys -t $SESSION_NAME:1 "docker run --rm --network dev-nixfastapi-network -v ./data/mongo:/data/db --name mongo mongo:8.0.13 | jq" C-m
+
+tmux new-window -t $SESSION_NAME -n "📦_Container" -c "$REPO_ROOT"
+tmux send-keys -t $SESSION_NAME:2 "docker run --rm --network dev-nixfastapi-network -p 7999:7999 --env DB_URI=mongodb://mongo --env FAKE_DATA=True "$IMAGE_TAG"" C-m
+
+tmux new-window -t $SESSION_NAME -n "🌐_Chrome" -c "$REPO_ROOT"
+tmux send-keys -t $SESSION_NAME:3 "chromium --user-data-dir=/tmp/chrome-dev --new-window --incognito --disable-cache --disk-cache-size=0 --media-cache-size=0 --remote-debugging-port=9222 http://0.0.0.0:7999" C-m
 
 echo "Tmux created session ✨'$SESSION_NAME'✨"
 tmux attach-session -t $SESSION_NAME

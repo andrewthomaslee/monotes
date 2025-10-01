@@ -4,8 +4,13 @@ __pycache__
 .pytest_cache
 __marimo__
 result
+result/
+data/
+fake_data/
 .direnv
 .devenv
 output.css
-docker
+docker-compose.yml
+Dockerfile
 .ruff_cache
+.vscode

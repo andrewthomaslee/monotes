@@ -54,14 +54,16 @@ if tmux has-session -t $SESSION_NAME 2>/dev/null; then
     handle_existing_session
 fi
 
+docker pull mongo:8.0.13
+
 tmux new-session -d -s $SESSION_NAME -n "🐋_Compose" -c "$REPO_ROOT"
 tmux send-keys -t $SESSION_NAME:0 "docker compose up --build" C-m
 
 tmux new-window -t $SESSION_NAME -n "🪵_Lazydocker" -c "$REPO_ROOT"
 tmux send-keys -t $SESSION_NAME:1 "lazydocker" C-m
 
-tmux new-window -t $SESSION_NAME -n "🦁_Brave" -c "$REPO_ROOT"
-tmux send-keys -t $SESSION_NAME:2 "brave --user-data-dir=/tmp/brave-dev-compose --new-window --incognito http://0.0.0.0:7999" C-m
+tmux new-window -t $SESSION_NAME -n "🌐_Chrome" -c "$REPO_ROOT"
+tmux send-keys -t $SESSION_NAME:2 "chromium --user-data-dir=/tmp/chrome-dev --new-window --incognito --disable-cache --disk-cache-size=0 --media-cache-size=0 --remote-debugging-port=9222 http://0.0.0.0:7999" C-m
 
 echo "Tmux created session ✨'$SESSION_NAME'✨"
 tmux attach-session -t $SESSION_NAME

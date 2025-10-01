@@ -1,0 +1,366 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    /* Light Mode (Default) */
+    --brand-accent: #7a5ccc;
+    --brand-accent-hover: #5d42a7;
+    --brand-text-required: #d93025;
+    --brand-success: #1e8e3e;
+
+    --bg-primary: #f3f4f6;
+    --bg-secondary: #ffffff;
+    --border-primary: #d1d5db;
+    --border-secondary: #9ca3af;
+    --text-primary: #111827;
+    --text-secondary: #374151;
+    --text-muted: #4b5563;
+    --text-placeholder: #9ca3af;
+  }
+
+  .dark {
+    /* Spaceduck (Dark Mode) Overrides */
+    --brand-accent: #7a5ccc;
+    --brand-accent-hover: #b3a1e6;
+    --brand-text-required: #e33400;
+    --brand-success: #5ccc96;
+
+    --bg-primary: #16172d;
+    --bg-secondary: #1b1c36;
+    --border-primary: #30365F;
+    --border-secondary: #686f9a;
+    --text-primary: #ffffff;
+    --text-secondary: #c1c3cc;
+    --text-muted: #ecf0c1;
+    --text-placeholder: #686f9a;
+  }
+  
+  body {
+    @apply bg-[var(--bg-primary)] transition-colors duration-300;
+  }
+}
+
+@layer components {
+  /* Page container - centers the card */
+  .form-container {
+    @apply min-h-screen flex flex-col items-center justify-center p-4;
+  }
+
+  /* The card component */
+  .form-card {
+    @apply w-full max-w-lg p-8 sm:p-10 rounded-2xl shadow-2xl transition-colors duration-300;
+    @apply bg-[var(--bg-secondary)] border border-[var(--border-primary)];
+  }
+
+  /* Centered heading for the card */
+  .form-heading {
+    @apply text-2xl font-bold text-center mb-8;
+    @apply text-[var(--text-primary)];
+  }
+
+  /* Vertical stack for form elements */
+  .form-stack {
+    @apply flex flex-col gap-y-5;
+  }
+
+  /* Container for individual form fields */
+  .form-group {
+    @apply flex flex-col;
+  }
+
+  /* Form label styling */
+  .form-label {
+    @apply mb-1.5 text-sm font-medium;
+    @apply text-[var(--text-muted)];
+  }
+
+  .form-label.required::after {
+    content: ' *';
+    @apply text-[var(--brand-text-required)];
+  }
+
+  /* Unified styling for inputs, selects, and textareas */
+  .form-input {
+    @apply block w-full px-4 py-2.5 rounded-lg transition-colors duration-200 ease-in-out;
+    @apply bg-[var(--bg-secondary)] border border-[var(--border-primary)];
+    @apply text-[var(--text-secondary)] placeholder:text-[var(--text-placeholder)];
+    @apply focus:outline-none focus:ring-2 focus:ring-[var(--brand-accent)] focus:border-[var(--brand-accent)];
+  }
+
+  /* Container for form action buttons */
+  .form-actions {
+    @apply flex justify-end items-center gap-4 pt-4;
+  }
+
+  /* Styling for the form error message */
+  .form-error {
+    @apply flex items-center gap-x-3 p-4 mt-2 rounded-lg text-sm;
+    @apply bg-[var(--brand-text-required)]/10 text-[var(--brand-text-required)];
+    @apply border-l-4 border-[var(--brand-text-required)];
+  }
+
+  /* Styling for the form success message */
+  .form-success {
+    @apply flex items-center gap-x-3 p-4 mt-2 rounded-lg text-sm;
+    @apply bg-[var(--brand-success)]/10 text-[var(--brand-success)];
+    @apply border-l-4 border-[var(--brand-success)];
+  }
+
+  /* Base button styling */
+  .btn {
+    @apply inline-flex items-center justify-center px-6 py-2.5 rounded-lg font-semibold;
+    @apply focus:outline-none focus:ring-2 focus:ring-offset-2;
+    @apply focus:ring-offset-[var(--bg-primary)];
+    @apply transition-all duration-200 ease-in-out;
+  }
+
+  /* Primary action button (Submit) */
+  .btn-primary {
+    @apply text-[var(--bg-secondary)];
+    @apply bg-[var(--brand-accent)] hover:bg-[var(--brand-accent-hover)];
+    @apply focus:ring-[var(--brand-accent-hover)];
+  }
+
+  /* Secondary action button (Reset) */
+  .btn-secondary {
+    @apply bg-transparent border;
+    @apply text-[var(--text-muted)] border-[var(--border-primary)];
+    @apply hover:bg-[var(--border-primary)] hover:text-[var(--text-primary)];
+    @apply focus:ring-[var(--border-secondary)];
+  }
+
+  /* Styling for the JSON code block */
+  .json-code-block {
+    @apply p-4 mt-4 rounded-lg;
+    @apply font-mono text-sm whitespace-pre-wrap break-all;
+    @apply bg-[var(--border-primary)]/40 border border-[var(--border-primary)];
+    @apply text-[var(--text-muted)];
+  }
+  
+  /* Floating, sticky banner container */
+  .top-banner {
+    @apply sticky top-4 inset-x-4 z-50;
+    @apply max-w-7xl mx-auto;
+    @apply bg-[var(--bg-secondary)]/80 backdrop-blur-lg;
+    @apply border border-[var(--border-primary)] rounded-xl shadow-lg;
+    @apply transition-colors duration-300;
+  }
+
+  /* Inner container for flex layout */
+  .top-banner-inner {
+    @apply flex items-center justify-between gap-4 px-4 py-2;
+  }
+
+  /* Container for the action buttons */
+  .banner-actions {
+    @apply flex items-center justify-end gap-2;
+  }
+
+  /* A stylish container for the username display */
+  .banner-username-display {
+    @apply bg-[var(--bg-primary)] border border-[var(--border-primary)] rounded-lg;
+    @apply px-4 py-2 text-sm font-bold text-[var(--text-primary)] whitespace-nowrap;
+  }
+
+  /* Specific styling for the circular theme toggle button */
+  .theme-toggle-btn {
+    @apply flex items-center justify-center size-9 rounded-full;
+    @apply bg-transparent text-[var(--text-muted)];
+    @apply hover:bg-[var(--border-primary)] hover:text-[var(--text-primary)];
+    @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--border-secondary)];
+    @apply focus:ring-offset-[var(--bg-secondary)];
+    @apply transition-colors duration-200;
+  }
+
+  /* Styling for the SVG icons inside the theme toggle */
+  .theme-icon {
+    @apply size-5;
+  }
+  
+  /* Base style for header buttons (e.g., Sign Out) */
+  .btn-header {
+    @apply inline-flex items-center justify-center px-5 py-2 rounded-lg text-sm font-semibold;
+    @apply bg-transparent border-2 border-[var(--border-secondary)];
+    @apply text-[var(--text-muted)];
+    @apply transition-colors duration-200 ease-in-out;
+    @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--border-secondary)];
+    @apply focus:ring-offset-[var(--bg-secondary)];
+    @apply hover:bg-[var(--border-primary)] hover:text-[var(--text-primary)];
+  }
+
+  /* Specific style for the red Admin Panel button */
+  .btn-header-admin {
+    @apply inline-flex items-center justify-center px-5 py-2 rounded-lg text-sm font-semibold;
+    @apply bg-transparent border-2 border-[var(--brand-text-required)];
+    @apply text-[var(--brand-text-required)];
+    @apply transition-colors duration-200 ease-in-out;
+    @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--brand-text-required)];
+    @apply focus:ring-offset-[var(--bg-secondary)];
+    @apply hover:bg-[var(--brand-text-required)]/10;
+  }
+
+  /* Active state for the admin header button */
+  .btn-header-admin.active {
+    @apply bg-[var(--brand-text-required)]/20 ring-1 ring-offset-1 ring-[var(--brand-text-required)] ring-offset-[var(--bg-secondary)];
+  }
+
+  /* === Check Out Elements === */
+
+  /* Main container for the Check Out form */
+  .checkout-card {
+    @apply w-full max-w-2xl mx-auto p-6 sm:p-8 rounded-2xl shadow-xl;
+    @apply bg-[var(--bg-secondary)] border border-[var(--border-primary)];
+  }
+
+  /* Styling for the top heading "Take this machine:" */
+  .checkout-heading {
+    @apply text-lg font-semibold text-[var(--text-primary)] mb-4;
+  }
+  
+  /* Flex container for Machine Name and Missing button */
+  .machine-info {
+    @apply flex items-center justify-between gap-4 p-4 rounded-lg;
+    @apply bg-[var(--bg-primary)] border border-[var(--border-primary)];
+  }
+
+  /* Large display for the machine name */
+  .machine-name-display {
+    @apply text-2xl font-bold text-[var(--text-primary)];
+  }
+
+  /* Responsive grid for task buttons */
+  .task-grid {
+    @apply grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 pt-6;
+  }
+
+  /* Individual task button styling */
+  .btn-task {
+    @apply w-full px-3 py-4 text-center rounded-lg text-sm font-semibold;
+    @apply bg-transparent border-2 border-[var(--border-primary)];
+    @apply text-[var(--text-muted)];
+    @apply transition-all duration-200 ease-in-out;
+    @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--brand-accent)];
+    @apply focus:ring-offset-[var(--bg-secondary)];
+    @apply hover:border-[var(--brand-accent)] hover:bg-[var(--brand-accent)]/10 hover:text-[var(--brand-accent)];
+  }
+  /* class for a selected task button */
+  .btn-task.selected {
+      @apply bg-[var(--brand-accent)] text-[var(--bg-secondary)] border-[var(--brand-accent)];
+  }
+  /* class for a selected button */
+  .active {
+    @apply bg-[var(--brand-accent)] text-[var(--bg-secondary)] border-[var(--brand-accent)];
+  }
+
+  /* Container for a slider and its label */
+  .slider-container {
+    @apply space-y-2;
+  }
+
+  /* Flex container for the slider's label text and value */
+  .slider-label {
+    @apply flex justify-between text-sm font-medium text-[var(--text-muted)];
+  }
+
+  /* Custom styling for the range slider */
+  .range-slider {
+    @apply w-full h-2 rounded-lg appearance-none cursor-pointer;
+    @apply bg-[var(--border-primary)];
+  }
+  .range-slider::-webkit-slider-thumb {
+    @apply appearance-none w-5 h-5 bg-[var(--brand-accent)] rounded-full ring-2 ring-[var(--bg-secondary)] shadow;
+  }
+  .range-slider::-moz-range-thumb {
+    @apply w-5 h-5 bg-[var(--brand-accent)] rounded-full border-none shadow;
+  }
+
+  /* Special styling for the large machine name text input */
+  .machine-name-input {
+    @apply text-center text-2xl font-bold p-4;
+  }
+
+  /* Wrapper for the main content and sidebar */
+  .content-wrapper {
+    @apply max-w-7xl mx-auto flex items-start gap-8 px-4 sm:px-6 lg:px-8;
+    @apply pt-8; /* Reduced top padding to push content below the banner */
+  }
+
+  /* Sticky sidebar card for the debug panel */
+  .debug-panel-card {
+    @apply sticky top-24 flex-shrink-0 w-80; /* Stays in place, fixed width */
+    @apply p-4 rounded-xl shadow-lg;
+    @apply bg-[var(--bg-secondary)] border border-[var(--border-primary)];
+  }
+
+  /* Main content area that will grow to fill space */
+  .main-content {
+    @apply flex-grow w-full; /* Takes up the remaining space */
+  }
+
+  /* Styling for session keys and values in the debug panel */
+  .session-key {
+    @apply font-semibold text-[var(--text-primary)];
+  }
+  .session-value {
+    @apply text-[var(--text-muted)];
+  }
+
+  /* Disabled state for buttons */
+  .btn.disabled {
+    @apply filter grayscale opacity-50 cursor-not-allowed pointer-events-none;
+  }
+
+  /* The main container for the table, providing the rounded corners and border */
+  .table-container {
+    @apply w-full overflow-hidden rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)] shadow-lg;
+  }
+  
+  /* Basic styling for the table itself */
+  .data-table {
+    @apply w-full text-sm;
+  }
+
+  /* Styling for the table header row */
+  .table-header {
+    @apply bg-[var(--bg-primary)] border-b-2 border-[var(--border-primary)];
+  }
+
+  /* Styling for header cells (<th>) */
+  .th-cell {
+    @apply px-4 py-3 text-left font-semibold text-[var(--text-muted)] uppercase tracking-wider;
+  }
+
+  /* Styling for body rows (<tr>) */
+  .table-row {
+    @apply border-b border-[var(--border-primary)] transition-colors duration-150;
+    @apply last:border-b-0; /* Removes border from the last row */
+    @apply hover:bg-[var(--bg-primary)];
+  }
+
+  /* Styling for data cells (<td>) */
+  .td-cell {
+    @apply px-4 py-3 text-[var(--text-secondary)] align-middle;
+  }
+
+  /* Container for table control buttons (pager, sorter) */
+  .table-controls {
+    @apply flex items-center justify-center gap-2 mb-4; /* Changed to justify-center */
+  }
+
+  /* Styling for individual control buttons */
+  .btn-control {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold; /* Increased text size and padding */
+    @apply bg-transparent border border-[var(--border-primary)];
+    @apply text-[var(--text-muted)];
+    @apply transition-colors duration-200 ease-in-out;
+    @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--border-secondary)];
+    @apply focus:ring-offset-[var(--bg-primary)];
+    @apply hover:bg-[var(--border-primary)] hover:text-[var(--text-primary)];
+  }
+
+  /* Styles for any .btn-control when it has the 'disabled' attribute */
+  .btn-control:disabled {
+    @apply opacity-50 cursor-not-allowed;
+    /* This will also override hover and focus effects */
+  }
+}
