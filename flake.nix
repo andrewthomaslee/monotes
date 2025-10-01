@@ -57,20 +57,20 @@
             pyproject-build-systems.overlays.default
             overlay
             (final: prev: {
-              bff-demo = prev.bff-demo.overrideAttrs (old: {
+              monotes = prev.monotes.overrideAttrs (old: {
                 passthru =
                   (old.passthru or {})
                   // {
                     tests = let
-                      virtualenv = final.mkVirtualEnv "bff-demo-venv-tests" {
-                        bff-demo = ["dev"];
+                      virtualenv = final.mkVirtualEnv "monotes-venv-tests" {
+                        monotes = ["dev"];
                       };
                     in
                       (old.tests or {})
                       // {
                         pytest = mkDerivation {
-                          name = "${final.bff-demo.name}-pytest";
-                          inherit (final.bff-demo) src;
+                          name = "${final.monotes.name}-pytest";
+                          inherit (final.monotes) src;
                           nativeBuildInputs = [virtualenv];
                           dontConfigure = true;
                           buildPhase = ''
@@ -85,8 +85,8 @@
                           '';
                         };
                         pyrefly = mkDerivation {
-                          name = "${final.bff-demo.name}-pyrefly";
-                          inherit (final.bff-demo) src;
+                          name = "${final.monotes.name}-pyrefly";
+                          inherit (final.monotes) src;
                           nativeBuildInputs = [virtualenv];
                           dontConfigure = true;
                           dontInstall = true;
@@ -98,8 +98,8 @@
                           '';
                         };
                         ruff = mkDerivation {
-                          name = "${final.bff-demo.name}-ruff";
-                          inherit (final.bff-demo) src;
+                          name = "${final.monotes.name}-ruff";
+                          inherit (final.monotes) src;
                           nativeBuildInputs = [virtualenv];
                           dontConfigure = true;
                           buildPhase = ''
@@ -124,7 +124,7 @@
     packages = forAllSystems (system: let
       pkgs = nixpkgs.legacyPackages.${system};
       pythonSet = pythonSets.${system};
-      venv = pythonSet.mkVirtualEnv "bff-demo-venv" workspace.deps.default;
+      venv = pythonSet.mkVirtualEnv "monotes-venv" workspace.deps.default;
       # alpine base docker image
       alpine = pkgs.dockerTools.pullImage {
         imageName = "alpine";
@@ -145,8 +145,8 @@
           then "arm64"
           else throw "Unsupported system: ${system}";
       };
-      bff-demo-package = pkgs.stdenv.mkDerivation {
-        name = "bff-demo-package";
+      monotes-package = pkgs.stdenv.mkDerivation {
+        name = "monotes-package";
         src = ./.;
         buildInputs = [venv];
         nativeBuildInputs = with pkgs; [tailwindcss_4];
@@ -164,15 +164,15 @@
         '';
       };
     in {
-      default = bff-demo-package;
-      bff-demo-container = pkgs.dockerTools.buildLayeredImage {
-        name = "bff-demo-container";
+      default = monotes-package;
+      monotes-container = pkgs.dockerTools.buildLayeredImage {
+        name = "monotes-container";
         created = "now";
         fromImage = alpine;
         maxLayers = 125;
         contents = [pkgs.curl];
         config = {
-          Cmd = ["${bff-demo-package}/main"];
+          Cmd = ["${monotes-package}/main"];
           ExposedPorts = {"7999/tcp" = {};};
           Healthcheck = {
             Test = ["CMD-SHELL" "curl -f http://localhost:7999/health || exit 1"];
@@ -186,7 +186,7 @@
       system: let
         pkgs = nixpkgs.legacyPackages.${system};
         pythonSet = pythonSets.${system};
-        venv = pythonSet.mkVirtualEnv "bff-demo-venv" workspace.deps.default;
+        venv = pythonSet.mkVirtualEnv "monotes-venv" workspace.deps.default;
         inherit (pkgs.lib) filterAttrs hasSuffix mapAttrsToList genAttrs;
 
         # App discovery and creation
@@ -229,11 +229,11 @@
         pkgs,
         ...
       }: let
-        cfg = config.services.bff-demo;
+        cfg = config.services.monotes;
       in {
         options = {
-          services.bff-demo = {
-            enable = lib.mkEnableOption "bff-demo";
+          services.monotes = {
+            enable = lib.mkEnableOption "monotes";
             domain = lib.mkOption {
               type = lib.types.str;
               default = "localhost";
@@ -245,53 +245,53 @@
           };
         };
         config = lib.mkIf cfg.enable {
-          systemd.services.bff-demo = {
-            description = "bff-demo.service";
+          systemd.services.monotes = {
+            description = "monotes.service";
             after = ["docker.service"];
             requires = ["docker.service"];
             wantedBy = ["multi-user.target"];
 
             serviceConfig = let
-              bff-start = pkgs.writeShellApplication {
-                name = "bff-start";
+              monotes-start = pkgs.writeShellApplication {
+                name = "monotes-start";
                 runtimeInputs = [pkgs.docker];
                 text = ''
-                  docker stop bff-demo-container || true
-                  docker rm bff-demo-container || true
-                  docker stop bff-demo-mongo || true
-                  docker rm bff-demo-mongo || true
+                  docker stop monotes-container || true
+                  docker rm monotes-container || true
+                  docker stop monotes-mongo || true
+                  docker rm monotes-mongo || true
 
-                  docker network create --driver bridge bff-demo-network || true
+                  docker network create --driver bridge monotes-network || true
 
                   docker pull mongo:8.0.13
 
-                  IMAGE_TAG=$(docker load < ${self.packages.${pkgs.system}.bff-demo-container} | grep -o 'bff-demo-container:[^ ]*')
+                  IMAGE_TAG=$(docker load < ${self.packages.${pkgs.system}.monotes-container} | grep -o 'monotes-container:[^ ]*')
 
-                  docker run -d --network bff-demo-network -v bff-demo-mongodb:/data/db --name bff-demo-mongo mongo:8.0.13
-                  docker run -d --network bff-demo-network --name bff-demo-container --env DB_URI=mongodb://bff-demo-mongo --env FAKE_DATA=${cfg.fake-data} \
+                  docker run -d --network monotes-network -v monotes-mongodb:/data/db --name monotes-mongo mongo:8.0.13
+                  docker run -d --network monotes-network --name monotes-container --env DB_URI=mongodb://monotes-mongo --env FAKE_DATA=${cfg.fake-data} \
                     --label "traefik.enable=true" \
-                    --label "traefik.http.routers.bff-demo.rule=Host(\`bff-demo.${cfg.domain}\`)" \
-                    --label "traefik.http.routers.bff-demo.entrypoints=websecure" \
-                    --label "traefik.http.routers.bff-demo.tls=true" \
-                    --label "traefik.http.services.bff-demo.loadbalancer.server.port=7999" \
-                    --label "traefik.http.services.bff-demo.loadbalancer.sticky.cookie=true" \
-                    --label "traefik.http.services.bff-demo.loadbalancer.sticky.cookie.name=sticky_cookie" \
-                    --label "traefik.http.services.bff-demo.loadbalancer.sticky.cookie.secure=true" \
-                    --label "traefik.http.services.bff-demo.loadbalancer.sticky.cookie.httpOnly=true" \
+                    --label "traefik.http.routers.monotes.rule=Host(\`monotes.${cfg.domain}\`)" \
+                    --label "traefik.http.routers.monotes.entrypoints=websecure" \
+                    --label "traefik.http.routers.monotes.tls=true" \
+                    --label "traefik.http.services.monotes.loadbalancer.server.port=7999" \
+                    --label "traefik.http.services.monotes.loadbalancer.sticky.cookie=true" \
+                    --label "traefik.http.services.monotes.loadbalancer.sticky.cookie.name=sticky_cookie" \
+                    --label "traefik.http.services.monotes.loadbalancer.sticky.cookie.secure=true" \
+                    --label "traefik.http.services.monotes.loadbalancer.sticky.cookie.httpOnly=true" \
                   "$IMAGE_TAG"
                 '';
               };
-              bff-stop = pkgs.writeShellApplication {
-                name = "bff-stop";
+              monotes-stop = pkgs.writeShellApplication {
+                name = "monotes-stop";
                 runtimeInputs = [pkgs.docker];
                 text = ''
-                  docker stop bff-demo-container || true
-                  docker stop bff-demo-mongo || true
+                  docker stop monotes-container || true
+                  docker stop monotes-mongo || true
 
-                  docker rm bff-demo-container || true
-                  docker rm bff-demo-mongo || true
+                  docker rm monotes-container || true
+                  docker rm monotes-mongo || true
 
-                  docker network rm bff-demo-network || true
+                  docker network rm monotes-network || true
                 '';
               };
             in {
@@ -302,8 +302,8 @@
               User = "root";
               Group = "docker";
               Restart = "on-failure";
-              ExecStart = "${bff-start}/bin/bff-start";
-              ExecStop = "${bff-stop}/bin/bff-stop";
+              ExecStart = "${monotes-start}/bin/monotes-start";
+              ExecStop = "${monotes-stop}/bin/monotes-stop";
             };
           };
         };
@@ -318,7 +318,7 @@
       };
       python = pkgs.python313;
       pythonSet = pythonSets.${system};
-      venv = pythonSet.mkVirtualEnv "bff-demo-dev-venv" workspace.deps.all;
+      venv = pythonSet.mkVirtualEnv "monotes-dev-venv" workspace.deps.all;
       # tmux.conf file
       tmuxConf = pkgs.writeText "tmux.conf" ''
         set -g mouse on
@@ -408,7 +408,7 @@
     checks = forAllSystems (system: let
       pythonSet = pythonSets.${system};
     in {
-      inherit (pythonSet.bff-demo.passthru.tests) pytest pyrefly ruff;
+      inherit (pythonSet.monotes.passthru.tests) pytest pyrefly ruff;
     });
 
     formatter = forAllSystems (

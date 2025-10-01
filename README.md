@@ -1,4 +1,4 @@
-# BFF-Demo
+# monotes
 ### Prerequisites
 - Docker
 - Nix Package Manager (with Flakes)
@@ -46,7 +46,7 @@ nix build
 ```
 ### Build Docker Image
 ```bash
-nix build .#bff-demo-container
+nix build .#monotes-container
 ```
 ### Check the flake.nix
 ```bash

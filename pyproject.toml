@@ -1,5 +1,5 @@
 [project]
-name = "bff-demo"
+name = "monotes"
 version = "0.1.0"
 description = "Packer Logs with Admin Dashboard"
 readme = "README.md"
