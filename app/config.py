@@ -13,6 +13,7 @@ class ConfigSettings(BaseSettings):
     DB_URI: str = "mongodb://localhost:27017"
     SECRET_KEY: str = "should-be-changed"
     FAKE_DATA: bool = True
+    DB_NAME: str = "monotes"
 
 
 CONFIG_SETTINGS: ConfigSettings = ConfigSettings()

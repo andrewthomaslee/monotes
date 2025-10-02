@@ -18,8 +18,8 @@ from jinja2 import Template
 
 # My Imports
 from .utils import current_time
-from .models import User, ActiveUsers, Task
-from .routes import api_router, settings_router, packer_router, admin_router
+from .models import User
+from .routes import api_router, settings_router
 from .db import init_db, load_fake_data
 from .config import BASE_DIR, CONFIG_SETTINGS, templates
 
@@ -130,8 +130,6 @@ async def http_exception_handler(request: Request, exc: HTTPException) -> _Templ
 # -------Middleware-&-Routers-------#
 app.include_router(api_router)
 app.include_router(settings_router)
-app.include_router(packer_router)
-app.include_router(admin_router)
 
 
 @app.middleware("http")

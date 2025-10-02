@@ -9,7 +9,7 @@ from pymongo import AsyncMongoClient
 from beanie import init_beanie
 
 # My Imports
-from .models import User, Machine, Log, ActiveUsers, MachineMissingLog
+from .models import User
 from .config import CONFIG_SETTINGS
 
 
@@ -22,8 +22,8 @@ async def init_db() -> None:
     logger.info("Initializing database...")
     client: AsyncMongoClient = AsyncMongoClient(CONFIG_SETTINGS.DB_URI)
     await init_beanie(
-        database=client["admin"],
-        document_models=[User, Machine, Log, ActiveUsers, MachineMissingLog],
+        database=client[CONFIG_SETTINGS.DB_NAME],
+        document_models=[User],
     )
     logger.info("Database initialized")
 
@@ -482,56 +482,6 @@ nouns: list[str] = [
 ]
 
 
-async def generate_machine_name() -> str:
-    adjective: str = random.choice(adjectives)
-    noun: str = random.choice(nouns)
-    return f"{adjective}-{noun}"
-
-
-async def create_fake_machines() -> None:
-    """Creates up to 50 fake machines with unique names."""
-    existing_machines: list[Machine] = await Machine.find_all().to_list()
-    num_existing: int = len(existing_machines)
-
-    if num_existing >= 50:
-        return None
-
-    existing_names: set[str] = {m.name for m in existing_machines}
-    names_to_create: int = 50 - num_existing
-    new_names: set[str] = set()
-
-    while len(new_names) < names_to_create:
-        name: str = await generate_machine_name()
-        if name not in existing_names and name not in new_names:
-            new_names.add(name)
-
-    fake_machines: list[Machine] = [
-        Machine(
-            name=name,
-            joined_condition=random.randint(0, 5),
-            special_note=random.choice(
-                [
-                    "What a great machine!",
-                    "With the Frizz? No way!",
-                    "I'm a machine?",
-                    "Turtles all the way down.",
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                ]
-            ),
-            joined_time=datetime.now() - timedelta(days=random.randint(0, 365)),
-        )
-        for name in new_names
-    ]
-
-    if fake_machines:
-        await Machine.insert_many(fake_machines)
-        logger.info(f"Created {len(fake_machines)} fake machines")
-
-
 async def generate_user_name() -> str:
     adjective: str = random.choice(adjectives)
     noun: str = random.choice(nouns)
@@ -560,5 +510,4 @@ async def load_fake_data() -> None:
     if CONFIG_SETTINGS.FAKE_DATA:
         await create_sudo_user()
         await create_plain_user()
-        await create_fake_machines()
         await create_fake_users()
